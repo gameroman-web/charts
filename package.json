@@ -10,7 +10,8 @@
     "lint": "oxlint",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "quality": "bun run format && bun run lint && bun run test && bun run typecheck"
+    "quality": "bun run format && bun run lint && bun run test && bun run typecheck",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@astrojs/solid-js": "^5.1.3",
@@ -23,6 +24,7 @@
     "@types/bun": "^1.3.5",
     "oxfmt": "^0.23.0",
     "oxlint": "^1.38.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.54.0"
   }
 }
