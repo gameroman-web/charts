@@ -77,8 +77,8 @@ describe("Chart Data Interpretation", () => {
       expect(result.isMultiSeries).toBe(true);
       expect(result.categoryHeader).toBe("Branch");
       expect(result.legend).toEqual([
-        { label: "Implementation", color: "#007acc" },
-        { label: "req/sec", color: "#ff6b6b" },
+        { label: "Solid", color: "#007acc" },
+        { label: "Astro", color: "#ff6b6b" },
       ]);
       expect(result.chartPoints).toHaveLength(4);
     });

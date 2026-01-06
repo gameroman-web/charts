@@ -19,7 +19,7 @@ export default function BarChart(props: BarChartProps) {
     if (data.headers.length < 2) return;
 
     // Interpret data structure
-    const { chartPoints, legend, isMultiSeries, categoryHeader } = interpretData(data);
+    const { chartPoints, legend, isMultiSeries, categoryHeader, valueHeader } = interpretData(data);
     if (!chartPoints.length) return;
 
     // Clear canvas
@@ -120,7 +120,7 @@ export default function BarChart(props: BarChartProps) {
     ctx.save();
     ctx.translate(15, canvas.height / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText(isMultiSeries ? "Values" : data.headers[1] || "Value", 0, 0);
+    ctx.fillText(valueHeader || "Value", 0, 0);
     ctx.restore();
 
     // Draw legend for multi-series

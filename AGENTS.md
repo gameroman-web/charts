@@ -7,9 +7,6 @@ This file contains guidelines and commands for agentic coding agents working on 
 ### Core Development
 
 ```bash
-# Start development server
-bun run dev
-
 # Build for production
 bun run build
 
@@ -25,6 +22,8 @@ bun test tests/csv.test.ts
 # Watch mode for tests
 bun test --watch
 ```
+
+Never start develpoment server yourself
 
 ### Code Quality
 
