@@ -1,0 +1,28 @@
+{
+  "name": "charts",
+  "private": true,
+  "description": "Simple web tool for creating bar charts from CSV files",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "format": "oxfmt --list-different && echo 'All files already formatted' || oxfmt",
+    "lint": "oxlint",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "quality": "bun run format && bun run lint && bun run test && bun run typecheck"
+  },
+  "dependencies": {
+    "@astrojs/solid-js": "^5.1.3",
+    "@tailwindcss/vite": "^4.1.17",
+    "astro": "^5.16.6",
+    "solid-js": "^1.9.10",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.5",
+    "oxfmt": "^0.23.0",
+    "oxlint": "^1.38.0",
+    "typescript": "^5.9.3"
+  }
+}
