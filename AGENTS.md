@@ -4,35 +4,20 @@ This file contains guidelines and commands for agentic coding agents working on 
 
 ## Development Commands
 
-### Core Development
+### Code Quality
 
 ```bash
-# Build for production
-bun run build
+# Format code
+bun run format
 
-# Preview production build
-bun run preview
+# Lint code
+bun run lint
 
 # Run all tests
 bun test
 
 # Run single test file
 bun test tests/csv.test.ts
-
-# Watch mode for tests
-bun test --watch
-```
-
-Never start develpoment server yourself
-
-### Code Quality
-
-```bash
-# Format code using oxfmt
-bun run format
-
-# Lint code using oxlint
-bun run lint
 ```
 
 ## Project Architecture
@@ -235,7 +220,6 @@ This is a simple bar chart visualization tool that:
 
 1. Accepts CSV files via drag-and-drop
 2. Automatically generates bar charts with proper axes labels
-3. Uses first column as X-axis labels, second column as Y-axis values
-4. Maintains a clean, minimalist UI design
+3. Maintains a clean, minimalist UI design
 
 The focus is on simplicity and ease of use - users should be able to drop a CSV file and immediately see a meaningful visualization.
