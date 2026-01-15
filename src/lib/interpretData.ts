@@ -63,7 +63,7 @@ export function interpretData(data: ChartData): {
     });
 
   let legend: LegendItem[] = [];
-  let chartPoints: ChartPoint[] = [];
+  const chartPoints: ChartPoint[] = [];
   
   if (isPivotFormat) {
     // Handle pivot format: Branch,Implementation,req/sec
