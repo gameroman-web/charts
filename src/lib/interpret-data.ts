@@ -16,6 +16,36 @@ export interface LegendItem {
   color: string;
 }
 
+const COLORS = ["#007acc", "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4"];
+
+function getUniqueCategories(
+  data: ChartData,
+  categoryHeader: string,
+): string[] {
+  return Array.from(
+    new Set(data.data.map((row) => String(row[categoryHeader] || ""))),
+  );
+}
+
+function getSeriesList(data: ChartData, isLongFormat: boolean): string[] {
+  if (isLongFormat && data.headers.length === 3) {
+    return Array.from(
+      new Set(data.data.map((row) => String(row[data.headers[1] ?? ""] || ""))),
+    );
+  }
+  if (isLongFormat) {
+    return data.headers.slice(2);
+  }
+  return data.headers.slice(1);
+}
+
+function buildLegend(seriesList: string[]): LegendItem[] {
+  return seriesList.map((name, index) => ({
+    label: name,
+    color: COLORS[index] ?? "#007acc",
+  }));
+}
+
 export function interpretData(data: ChartData): {
   chartPoints: ChartPoint[];
   legend: LegendItem[];
@@ -23,7 +53,6 @@ export function interpretData(data: ChartData): {
   categoryHeader: string;
   valueHeader: string;
 } {
-  // Handle case with insufficient data
   if (!data || data.headers.length < 2 || !data.data.length) {
     return {
       chartPoints: [],
@@ -34,131 +63,59 @@ export function interpretData(data: ChartData): {
     };
   }
 
-  // Simple case: Category,Value (like Branch,Solid)
+  const categoryHeader = data.headers[0] ?? "";
+  const categories = getUniqueCategories(data, categoryHeader);
+
   if (data.headers.length === 2) {
     const chartPoints = data.data.map((row) => ({
-      label: String(row[data.headers[0]!] || ""),
-      value: Number(row[data.headers[1]!]) || 0,
+      label: String(row[data.headers[0] ?? ""] ?? ""),
+      value: Number(row[data.headers[1] ?? ""]) || 0,
     }));
 
     return {
       chartPoints,
       legend: [],
       isMultiSeries: false,
-      categoryHeader: data.headers[0] || "",
-      valueHeader: data.headers[1] || "",
+      categoryHeader: data.headers[0] ?? "",
+      valueHeader: data.headers[1] ?? "",
     };
   }
 
-  // Multi-series case: Branch,Solid,Astro or Branch,Implementation,req/sec
-  const categoryHeader = data.headers[0] || "";
-
-  // Check if this is a pivot format:
-  // - 3 columns: Branch,Implementation,req/sec (2nd col = series names, 3rd = values)
-  // - 4+ columns: Version,Framework,Metric1,Metric2 (2nd = series names, rest = values)
-  const isPivotFormat =
-    data.headers.length >= 3 &&
+  const isLongFormat =
     data.data.length > 0 &&
-    data.data.every((row) => {
-      const secondCol = row[data.headers[1]!];
-      return typeof secondCol === "string";
-    });
+    data.data.every((row) => typeof row[data.headers[1] ?? ""] === "string");
 
-  let legend: LegendItem[] = [];
+  const seriesList = getSeriesList(data, isLongFormat);
+  const legend = buildLegend(seriesList);
   const chartPoints: ChartPoint[] = [];
 
-  if (isPivotFormat) {
-    // Handle pivot format: Branch,Implementation,req/sec OR Version,Framework,Metric1,Metric2
-    const seriesHeader = data.headers[1]!;
-    const valueHeaders = data.headers.slice(2); // Multiple value columns for 4+ format
+  const valueHeader = isLongFormat
+    ? (data.headers[2] ?? "Values")
+    : (data.headers[1] ?? "Values");
 
-    // Get unique series names
-    const seriesNames = Array.from(
-      new Set(data.data.map((row) => String(row[seriesHeader] || ""))),
-    );
-
-    // Get categories
-    const categories = Array.from(
-      new Set(data.data.map((row) => String(row[categoryHeader] || ""))),
-    );
-
-    // Define colors
-    const colors = ["#007acc", "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4"];
-    const seriesColors = colors.slice(0, seriesNames.length);
-
-    // Create legend - use value headers as series names (for 4+ columns) or series names (for 3 columns)
-    const seriesList = data.headers.length === 3 ? seriesNames : valueHeaders;
-    legend = seriesList.map((name, index) => ({
-      label: name,
-      color: seriesColors[index] || "#007acc",
-    }));
-
-    // Create chart points
-    const seriesColumnHeader = data.headers[1];
-    categories.forEach((category) => {
-      seriesList.forEach((seriesName) => {
-        let row: Record<string, string | number> | undefined;
-        let value = 0;
+  categories.forEach((category) => {
+    seriesList.forEach((seriesName) => {
+      let value = 0;
+      const row = data.data.find(
+        (r) => String(r[categoryHeader] || "") === category,
+      );
+      if (isLongFormat) {
         if (data.headers.length === 3) {
-          row = data.data.find(
+          const match = data.data.find(
             (r) =>
               String(r[categoryHeader] || "") === category &&
-              String(r[seriesColumnHeader!] || "") === seriesName,
+              String(r[data.headers[1] ?? ""] || "") === seriesName,
           );
-          value = Number(row?.[valueHeaders[0] ?? ""]) || 0;
+          value = Number(match?.[data.headers[2] ?? ""]) || 0;
         } else {
-          row = data.data.find(
-            (r) => String(r[categoryHeader] || "") === category,
-          );
           value = Number(row?.[seriesName]) || 0;
         }
-        chartPoints.push({
-          label: category,
-          value,
-          series: seriesName,
-        });
-      });
+      } else {
+        value = Number(row?.[seriesName]) || 0;
+      }
+      chartPoints.push({ label: category, value, series: seriesName });
     });
-  } else {
-    // Handle tabular format: Branch,Solid,Astro
-    const valueHeaders = data.headers.slice(1);
-
-    // Group by category
-    const categories = Array.from(
-      new Set(data.data.map((row) => String(row[categoryHeader] || ""))),
-    );
-
-    // Define colors for different series
-    const colors = ["#007acc", "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4"];
-    const seriesColors = colors.slice(0, valueHeaders.length);
-
-    // Create legend
-    legend = valueHeaders.map((header, index) => ({
-      label: header,
-      color: seriesColors[index] || "#007acc",
-    }));
-
-    // Flatten data for grouped bar chart
-    categories.forEach((category) => {
-      valueHeaders.forEach((valueHeader) => {
-        const row = data.data.find(
-          (r) => String(r[categoryHeader] || "") === category,
-        );
-        if (row && valueHeader in row) {
-          chartPoints.push({
-            label: category,
-            value: Number(row[valueHeader]) || 0,
-            series: valueHeader,
-          });
-        }
-      });
-    });
-  }
-
-  // Determine the appropriate value header for Y-axis label
-  const valueHeader = isPivotFormat
-    ? (data.headers[2] ?? "Values")
-    : data.headers[1] || "Values";
+  });
 
   return {
     chartPoints,
