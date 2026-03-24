@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createSignal } from "solid-js";
 
 import { parseCSV } from "#lib/csv";
 
@@ -16,23 +16,16 @@ export default function CsvUpload(props: CsvUploadProps) {
 
   const handlePaste = (e: ClipboardEvent) => {
     const text = e.clipboardData?.getData("text");
-    if (text) {
-      try {
-        const data = parseCSV(text);
-        props.onDataLoaded(data);
-      } catch (error) {
-        console.error("Failed to parse pasted CSV:", error);
-      }
+    if (!text) return;
+
+    const data = parseCSV(text);
+    if (data.headers.length === 0 && data.data.length === 0) {
+      console.warn("handlePaste: No valid CSV data in paste");
+      return;
     }
+
+    props.onDataLoaded(data);
   };
-
-  onMount(() => {
-    document.addEventListener("paste", handlePaste);
-  });
-
-  onCleanup(() => {
-    document.removeEventListener("paste", handlePaste);
-  });
 
   const handleFile = (file: File) => {
     if (file.type !== "text/csv") return;
@@ -79,6 +72,7 @@ export default function CsvUpload(props: CsvUploadProps) {
 
   return (
     <div
+      onPaste={handlePaste}
       class={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all duration-300 ${
         isDragOver()
           ? "border-blue-500 bg-blue-50 shadow-sm"
