@@ -334,4 +334,170 @@ describe("Chart Data Interpretation", () => {
       });
     });
   });
+
+  describe("CSV format interpretation tests", () => {
+    it("should interpret CSV 1: Branch,Category,Value format (pivot)", () => {
+      const csvData: ChartData = {
+        headers: ["Branch", "Category", "Value"],
+        data: [
+          { Branch: "main", Category: "Solid", Value: 30 },
+          { Branch: "main", Category: "Astro", Value: 20 },
+          { Branch: "dev", Category: "Solid", Value: 32 },
+          { Branch: "dev", Category: "Astro", Value: 40 },
+        ],
+      };
+
+      const result = interpretData(csvData);
+
+      expect(result.isMultiSeries).toBe(true);
+      expect(result.categoryHeader).toBe("Branch");
+      expect(result.valueHeader).toBe("Value");
+      expect(result.legend).toEqual([
+        { label: "Solid", color: "#007acc" },
+        { label: "Astro", color: "#ff6b6b" },
+      ]);
+      expect(result.chartPoints).toHaveLength(4);
+
+      const mainSolid = result.chartPoints.find(
+        (p) => p.label === "main" && p.series === "Solid",
+      );
+      const devAstro = result.chartPoints.find(
+        (p) => p.label === "dev" && p.series === "Astro",
+      );
+      expect(mainSolid?.value).toBe(30);
+      expect(devAstro?.value).toBe(40);
+    });
+
+    it("should interpret CSV 2: Branch,Solid,Astro format (tabular)", () => {
+      const csvData: ChartData = {
+        headers: ["Branch", "Solid", "Astro"],
+        data: [
+          { Branch: "main", Solid: 30, Astro: 20 },
+          { Branch: "dev", Solid: 32, Astro: 40 },
+        ],
+      };
+
+      const result = interpretData(csvData);
+
+      expect(result.isMultiSeries).toBe(true);
+      expect(result.categoryHeader).toBe("Branch");
+      expect(result.valueHeader).toBe("Solid");
+      expect(result.legend).toEqual([
+        { label: "Solid", color: "#007acc" },
+        { label: "Astro", color: "#ff6b6b" },
+      ]);
+      expect(result.chartPoints).toHaveLength(4);
+
+      const mainSolid = result.chartPoints.find(
+        (p) => p.label === "main" && p.series === "Solid",
+      );
+      const devAstro = result.chartPoints.find(
+        (p) => p.label === "dev" && p.series === "Astro",
+      );
+      expect(mainSolid?.value).toBe(30);
+      expect(devAstro?.value).toBe(40);
+    });
+
+    it("should interpret CSV 3: Branch,Solid,Astro,React format", () => {
+      const csvData: ChartData = {
+        headers: ["Branch", "Solid", "Astro", "React"],
+        data: [
+          { Branch: "main", Solid: 30, Astro: 20, React: 25 },
+          { Branch: "dev", Solid: 32, Astro: 40, React: 35 },
+          { Branch: "staging", Solid: 28, Astro: 22, React: 24 },
+        ],
+      };
+
+      const result = interpretData(csvData);
+
+      expect(result.isMultiSeries).toBe(true);
+      expect(result.categoryHeader).toBe("Branch");
+      expect(result.valueHeader).toBe("Solid");
+      expect(result.legend).toEqual([
+        { label: "Solid", color: "#007acc" },
+        { label: "Astro", color: "#ff6b6b" },
+        { label: "React", color: "#4ecdc4" },
+      ]);
+      expect(result.chartPoints).toHaveLength(9);
+
+      const stagingReact = result.chartPoints.find(
+        (p) => p.label === "staging" && p.series === "React",
+      );
+      expect(stagingReact?.value).toBe(24);
+    });
+
+    it("should interpret CSV 4: Branch,Framework,Bundle_Size format (pivot with decimals)", () => {
+      const csvData: ChartData = {
+        headers: ["Branch", "Framework", "Bundle_Size"],
+        data: [
+          { Branch: "production", Framework: "Solid", Bundle_Size: 12.5 },
+          { Branch: "production", Framework: "Astro", Bundle_Size: 14.2 },
+          { Branch: "production", Framework: "React", Bundle_Size: 45.0 },
+          { Branch: "production", Framework: "Vue", Bundle_Size: 32.1 },
+          { Branch: "development", Framework: "Solid", Bundle_Size: 13.0 },
+          { Branch: "development", Framework: "Astro", Bundle_Size: 15.5 },
+          { Branch: "development", Framework: "React", Bundle_Size: 48.2 },
+          { Branch: "development", Framework: "Vue", Bundle_Size: 34.0 },
+        ],
+      };
+
+      const result = interpretData(csvData);
+
+      expect(result.isMultiSeries).toBe(true);
+      expect(result.categoryHeader).toBe("Branch");
+      expect(result.valueHeader).toBe("Bundle_Size");
+      expect(result.legend).toEqual([
+        { label: "Solid", color: "#007acc" },
+        { label: "Astro", color: "#ff6b6b" },
+        { label: "React", color: "#4ecdc4" },
+        { label: "Vue", color: "#45b7d1" },
+      ]);
+      expect(result.chartPoints).toHaveLength(8);
+
+      const prodReact = result.chartPoints.find(
+        (p) => p.label === "production" && p.series === "React",
+      );
+      const devVue = result.chartPoints.find(
+        (p) => p.label === "development" && p.series === "Vue",
+      );
+      expect(prodReact?.value).toBe(45.0);
+      expect(devVue?.value).toBe(34.0);
+    });
+
+    it("should interpret CSV 5: Module,Baseline,Optimized format", () => {
+      const csvData: ChartData = {
+        headers: ["Module", "Baseline", "Optimized"],
+        data: [
+          { Module: "Auth", Baseline: 120, Optimized: 85 },
+          { Module: "DB_Query", Baseline: 450, Optimized: 310 },
+          { Module: "UI_Render", Baseline: 300, Optimized: 290 },
+          { Module: "API_Call", Baseline: 150, Optimized: 145 },
+          { Module: "Storage", Baseline: 80, Optimized: 40 },
+          { Module: "Logging", Baseline: 50, Optimized: 48 },
+          { Module: "Crypto", Baseline: 600, Optimized: 420 },
+          { Module: "Assets", Baseline: 210, Optimized: 195 },
+        ],
+      };
+
+      const result = interpretData(csvData);
+
+      expect(result.isMultiSeries).toBe(true);
+      expect(result.categoryHeader).toBe("Module");
+      expect(result.valueHeader).toBe("Baseline");
+      expect(result.legend).toEqual([
+        { label: "Baseline", color: "#007acc" },
+        { label: "Optimized", color: "#ff6b6b" },
+      ]);
+      expect(result.chartPoints).toHaveLength(16);
+
+      const cryptoBaseline = result.chartPoints.find(
+        (p) => p.label === "Crypto" && p.series === "Baseline",
+      );
+      const storageOptimized = result.chartPoints.find(
+        (p) => p.label === "Storage" && p.series === "Optimized",
+      );
+      expect(cryptoBaseline?.value).toBe(600);
+      expect(storageOptimized?.value).toBe(40);
+    });
+  });
 });

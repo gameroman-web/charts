@@ -94,14 +94,27 @@ export function interpretData(data: ChartData): {
     }));
 
     // Create chart points
+    const seriesColumnHeader = data.headers[1];
     categories.forEach((category) => {
       seriesList.forEach((seriesName) => {
-        const row = data.data.find(
-          (r) => String(r[categoryHeader] || "") === category,
-        );
+        let row: Record<string, string | number> | undefined;
+        let value = 0;
+        if (data.headers.length === 3) {
+          row = data.data.find(
+            (r) =>
+              String(r[categoryHeader] || "") === category &&
+              String(r[seriesColumnHeader!] || "") === seriesName,
+          );
+          value = Number(row?.[valueHeaders[0] ?? ""]) || 0;
+        } else {
+          row = data.data.find(
+            (r) => String(r[categoryHeader] || "") === category,
+          );
+          value = Number(row?.[seriesName]) || 0;
+        }
         chartPoints.push({
           label: category,
-          value: Number(row?.[seriesName]) || 0,
+          value,
           series: seriesName,
         });
       });
