@@ -1,6 +1,10 @@
 import { createEffect } from "solid-js";
 
-import { interpretData, type ChartData, type LegendItem } from "../lib/interpretData";
+import {
+  type ChartData,
+  interpretData,
+  type LegendItem,
+} from "#lib/interpret-data";
 
 interface BarChartProps {
   title: string;
@@ -19,7 +23,8 @@ export default function BarChart(props: BarChartProps) {
     if (data.headers.length < 2) return;
 
     // Interpret data structure
-    const { chartPoints, legend, isMultiSeries, categoryHeader, valueHeader } = interpretData(data);
+    const { chartPoints, legend, isMultiSeries, categoryHeader, valueHeader } =
+      interpretData(data);
     if (!chartPoints.length) return;
 
     // Clear canvas
@@ -32,10 +37,14 @@ export default function BarChart(props: BarChartProps) {
 
     // Calculate scales
     const maxValue = Math.max(...chartPoints.map((d) => d.value));
-    const categoryCount = Array.from(new Set(chartPoints.map((d) => d.label))).length;
+    const categoryCount = Array.from(
+      new Set(chartPoints.map((d) => d.label)),
+    ).length;
 
     // Adjust bar width for grouped bars
-    const seriesCount = isMultiSeries ? new Set(chartPoints.map((d) => d.series)).size : 1;
+    const seriesCount = isMultiSeries
+      ? new Set(chartPoints.map((d) => d.series)).size
+      : 1;
     const groupWidth = chartWidth / categoryCount;
     const barWidth = (groupWidth * 0.8) / seriesCount;
     const barSpacing = (groupWidth * 0.2) / seriesCount;
@@ -77,7 +86,8 @@ export default function BarChart(props: BarChartProps) {
       const groupX = padding + categoryIndex * groupWidth + groupWidth / 2;
 
       // Center group
-      const totalBarWidth = categoryData.length * barWidth + (categoryData.length - 1) * barSpacing;
+      const totalBarWidth =
+        categoryData.length * barWidth + (categoryData.length - 1) * barSpacing;
       const startX = groupX - totalBarWidth / 2;
 
       categoryData.forEach((item, seriesIndex) => {
@@ -87,9 +97,9 @@ export default function BarChart(props: BarChartProps) {
 
         // Draw bar with appropriate color
         if (item.series && isMultiSeries) {
-          const seriesIdx = Array.from(new Set(chartPoints.map((d) => d.series))).indexOf(
-            item.series,
-          );
+          const seriesIdx = Array.from(
+            new Set(chartPoints.map((d) => d.series)),
+          ).indexOf(item.series);
           ctx.fillStyle = colors[seriesIdx] || "#007acc";
         } else {
           ctx.fillStyle = "#007acc";
@@ -129,7 +139,11 @@ export default function BarChart(props: BarChartProps) {
     }
   };
 
-  const drawLegend = (ctx: CanvasRenderingContext2D, legend: LegendItem[], padding: number) => {
+  const drawLegend = (
+    ctx: CanvasRenderingContext2D,
+    legend: LegendItem[],
+    padding: number,
+  ) => {
     const legendX = ctx.canvas.width - padding - 120;
     const legendY = padding;
 

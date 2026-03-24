@@ -1,12 +1,12 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 
 import {
-  interpretData,
+  type ChartData,
   getCategories,
   getValueHeaders,
+  interpretData,
   isMultiSeriesData,
-  type ChartData,
-} from "../src/lib/interpretData";
+} from "#lib/interpret-data";
 
 // Test data interpretation logic (separate from CSV parsing)
 describe("Chart Data Interpretation", () => {
@@ -24,6 +24,7 @@ describe("Chart Data Interpretation", () => {
 
       expect(result.isMultiSeries).toBe(false);
       expect(result.categoryHeader).toBe("Branch");
+      expect(result.valueHeader).toBe("Solid");
       expect(result.legend).toEqual([]);
       expect(result.chartPoints).toEqual([
         { label: "main", value: 32 },
@@ -44,6 +45,7 @@ describe("Chart Data Interpretation", () => {
 
       expect(result.isMultiSeries).toBe(true);
       expect(result.categoryHeader).toBe("Branch");
+      expect(result.valueHeader).toBe("Solid");
       expect(result.legend).toEqual([
         { label: "Solid", color: "#007acc" },
         { label: "Astro", color: "#ff6b6b" },
@@ -51,12 +53,20 @@ describe("Chart Data Interpretation", () => {
 
       // Check chart points structure
       expect(result.chartPoints).toHaveLength(4); // 2 categories × 2 series
-      expect(result.chartPoints.filter((p) => p.label === "main")).toHaveLength(2);
-      expect(result.chartPoints.filter((p) => p.label === "jg")).toHaveLength(2);
+      expect(result.chartPoints.filter((p) => p.label === "main")).toHaveLength(
+        2,
+      );
+      expect(result.chartPoints.filter((p) => p.label === "jg")).toHaveLength(
+        2,
+      );
 
       // Check specific values
-      const mainSolid = result.chartPoints.find((p) => p.label === "main" && p.series === "Solid");
-      const mainAstro = result.chartPoints.find((p) => p.label === "main" && p.series === "Astro");
+      const mainSolid = result.chartPoints.find(
+        (p) => p.label === "main" && p.series === "Solid",
+      );
+      const mainAstro = result.chartPoints.find(
+        (p) => p.label === "main" && p.series === "Astro",
+      );
       expect(mainSolid?.value).toBe(32);
       expect(mainAstro?.value).toBe(8);
     });
@@ -76,6 +86,7 @@ describe("Chart Data Interpretation", () => {
 
       expect(result.isMultiSeries).toBe(true);
       expect(result.categoryHeader).toBe("Branch");
+      expect(result.valueHeader).toBe("req/sec");
       expect(result.legend).toEqual([
         { label: "Solid", color: "#007acc" },
         { label: "Astro", color: "#ff6b6b" },
@@ -98,6 +109,7 @@ describe("Chart Data Interpretation", () => {
 
       expect(result.isMultiSeries).toBe(true);
       expect(result.categoryHeader).toBe("Version");
+      expect(result.valueHeader).toBe("Framework");
       expect(result.legend).toEqual([
         { label: "Framework", color: "#007acc" },
         { label: "Metric1", color: "#ff6b6b" },
@@ -121,7 +133,9 @@ describe("Chart Data Interpretation", () => {
       expect(result.chartPoints).toHaveLength(6);
 
       // Check that missing values are treated as 0
-      const jgSolid = result.chartPoints.find((p) => p.label === "jg" && p.series === "Solid");
+      const jgSolid = result.chartPoints.find(
+        (p) => p.label === "jg" && p.series === "Solid",
+      );
       const featureAstro = result.chartPoints.find(
         (p) => p.label === "feature" && p.series === "Astro",
       );
@@ -141,12 +155,29 @@ describe("Chart Data Interpretation", () => {
       expect(result.legend).toEqual([]);
       expect(result.isMultiSeries).toBe(false);
       expect(result.categoryHeader).toBe("");
+      expect(result.valueHeader).toBe("");
     });
 
     it("should create legend with proper colors", () => {
       const csvData: ChartData = {
-        headers: ["Test", "ResultA", "ResultB", "ResultC", "ResultD", "ResultE"],
-        data: [{ Test: "test1", ResultA: 10, ResultB: 15, ResultC: 8, ResultD: 12, ResultE: 7 }],
+        headers: [
+          "Test",
+          "ResultA",
+          "ResultB",
+          "ResultC",
+          "ResultD",
+          "ResultE",
+        ],
+        data: [
+          {
+            Test: "test1",
+            ResultA: 10,
+            ResultB: 15,
+            ResultC: 8,
+            ResultD: 12,
+            ResultE: 7,
+          },
+        ],
       };
 
       const result = interpretData(csvData);

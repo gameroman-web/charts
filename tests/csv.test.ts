@@ -1,6 +1,6 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 
-import { parseCSV } from "../src/lib/csv.ts";
+import { parseCSV } from "#lib/csv";
 
 describe("CSV Parser", () => {
   it("should parse simple CSV data", () => {
@@ -16,7 +16,8 @@ describe("CSV Parser", () => {
   });
 
   it("should handle CSV with mixed data types", () => {
-    const csvText = "product,price,category\nApple,1.50,Fruit\nBook,12.99,Education";
+    const csvText =
+      "product,price,category\nApple,1.50,Fruit\nBook,12.99,Education";
     const result = parseCSV(csvText);
 
     expect(result.data).toEqual([

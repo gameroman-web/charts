@@ -15,7 +15,7 @@ export function parseCSV(csvText: string) {
     headers.forEach((header, index) => {
       const value = values[index];
       if (value !== undefined) {
-        row[header] = isNaN(Number(value)) ? value : Number(value);
+        row[header] = Number.isNaN(Number(value)) ? value : Number(value);
       }
     });
 

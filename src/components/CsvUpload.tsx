@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { parseCSV } from "../lib/csv";
+import { parseCSV } from "#lib/csv";
 
 interface ChartData {
   headers: string[];
