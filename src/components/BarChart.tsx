@@ -78,7 +78,6 @@ export default function BarChart(props: BarChartProps) {
 
     // Draw bars
     const categories = Array.from(new Set(chartPoints.map((d) => d.label)));
-    const colors = ["#007acc", "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4"];
 
     ctx.textAlign = "center";
     categories.forEach((category, categoryIndex) => {
@@ -95,15 +94,9 @@ export default function BarChart(props: BarChartProps) {
         const x = startX + seriesIndex * (barWidth + barSpacing);
         const y = canvas.height - padding - barHeight;
 
-        // Draw bar with appropriate color
-        if (item.series && isMultiSeries) {
-          const seriesIdx = Array.from(
-            new Set(chartPoints.map((d) => d.series)),
-          ).indexOf(item.series);
-          ctx.fillStyle = colors[seriesIdx] || "#007acc";
-        } else {
-          ctx.fillStyle = "#007acc";
-        }
+        // Draw bar with color from legend
+        const legendItem = legend.find((l) => l.label === item.series);
+        ctx.fillStyle = legendItem?.color ?? "#007acc";
         ctx.fillRect(x, y, barWidth, barHeight);
 
         // Draw value on top of bar

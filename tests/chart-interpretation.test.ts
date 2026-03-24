@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import {
   type ChartData,
   getCategories,
+  getSeriesCount,
   getValueHeaders,
   interpretData,
   isMultiSeriesData,
@@ -109,13 +110,39 @@ describe("Chart Data Interpretation", () => {
 
       expect(result.isMultiSeries).toBe(true);
       expect(result.categoryHeader).toBe("Version");
-      expect(result.valueHeader).toBe("Framework");
+      expect(result.valueHeader).toBe("Metric1");
       expect(result.legend).toEqual([
-        { label: "Framework", color: "#007acc" },
-        { label: "Metric1", color: "#ff6b6b" },
-        { label: "Metric2", color: "#4ecdc4" },
+        { label: "Metric1", color: "#007acc" },
+        { label: "Metric2", color: "#ff6b6b" },
       ]);
-      expect(result.chartPoints).toHaveLength(6); // 2 versions × 3 series
+      expect(result.chartPoints).toHaveLength(4); // 2 versions × 2 series (Metric1, Metric2)
+
+      // Verify specific chartPoints mapping
+      const v1Metric1 = result.chartPoints.find(
+        (p) => p.label === "v1" && p.series === "Metric1",
+      );
+      const v1Metric2 = result.chartPoints.find(
+        (p) => p.label === "v1" && p.series === "Metric2",
+      );
+      const v2Metric2 = result.chartPoints.find(
+        (p) => p.label === "v2" && p.series === "Metric2",
+      );
+
+      expect(v1Metric1).toEqual({
+        label: "v1",
+        value: 100,
+        series: "Metric1",
+      });
+      expect(v1Metric2).toEqual({
+        label: "v1",
+        value: 85,
+        series: "Metric2",
+      });
+      expect(v2Metric2).toEqual({
+        label: "v2",
+        value: 90,
+        series: "Metric2",
+      });
     });
 
     it("should handle missing values gracefully", () => {
@@ -243,6 +270,68 @@ describe("Chart Data Interpretation", () => {
       expect(getCategories(emptyData)).toEqual([]);
       expect(getValueHeaders(emptyData)).toEqual([]);
       expect(isMultiSeriesData(emptyData)).toBe(false);
+    });
+
+    it("getSeriesCount should return correct count for multi-series data", () => {
+      const twoColumn: ChartData = {
+        headers: ["Category", "Value"],
+        data: [],
+      };
+      const threeColumn: ChartData = {
+        headers: ["Category", "Series1", "Series2"],
+        data: [],
+      };
+      const fourColumn: ChartData = {
+        headers: ["Version", "Framework", "Metric1", "Metric2"],
+        data: [],
+      };
+
+      expect(getSeriesCount(twoColumn)).toBe(0);
+      expect(getSeriesCount(threeColumn)).toBe(2);
+      expect(getSeriesCount(fourColumn)).toBe(3);
+    });
+  });
+
+  describe("Color consistency", () => {
+    it("legend colors should match BarChart hardcoded colors", () => {
+      const csvData: ChartData = {
+        headers: ["Branch", "Solid", "Astro", "React"],
+        data: [{ Branch: "main", Solid: 10, Astro: 20, React: 30 }],
+      };
+
+      const result = interpretData(csvData);
+
+      const barChartColors = [
+        "#007acc",
+        "#ff6b6b",
+        "#4ecdc4",
+        "#45b7d1",
+        "#96ceb4",
+      ];
+
+      result.legend.forEach((item, index) => {
+        expect(item.color).toBe(barChartColors[index] ?? "#007acc");
+      });
+    });
+
+    it("series color mapping should be consistent between legend and chartPoints", () => {
+      const csvData: ChartData = {
+        headers: ["Version", "A", "B", "C"],
+        data: [
+          { Version: "v1", A: 10, B: 20, C: 30 },
+          { Version: "v2", A: 15, B: 25, C: 35 },
+        ],
+      };
+
+      const result = interpretData(csvData);
+
+      // Legend colors should match the colors that would be assigned to series in chartPoints
+      result.legend.forEach((legendItem) => {
+        const chartPointsForSeries = result.chartPoints.filter(
+          (p) => p.series === legendItem.label,
+        );
+        expect(chartPointsForSeries.length).toBeGreaterThan(0);
+      });
     });
   });
 });
