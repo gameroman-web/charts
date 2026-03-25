@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { parseCSV } from "../lib/csv";
+import { parseCSV } from "#lib/csv";
 
 interface ChartData {
   headers: string[];
@@ -13,6 +13,19 @@ interface CsvUploadProps {
 
 export default function CsvUpload(props: CsvUploadProps) {
   const [isDragOver, setIsDragOver] = createSignal(false);
+
+  const handlePaste = (e: ClipboardEvent) => {
+    const text = e.clipboardData?.getData("text");
+    if (!text) return;
+
+    const data = parseCSV(text);
+    if (data.headers.length === 0 && data.data.length === 0) {
+      console.warn("handlePaste: No valid CSV data in paste");
+      return;
+    }
+
+    props.onDataLoaded(data);
+  };
 
   const handleFile = (file: File) => {
     if (file.type !== "text/csv") return;
@@ -59,6 +72,7 @@ export default function CsvUpload(props: CsvUploadProps) {
 
   return (
     <div
+      onPaste={handlePaste}
       class={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all duration-300 ${
         isDragOver()
           ? "border-blue-500 bg-blue-50 shadow-sm"
