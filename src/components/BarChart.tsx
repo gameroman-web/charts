@@ -2,6 +2,7 @@ import { createEffect } from "solid-js";
 
 import {
   type ChartData,
+  getCategories,
   interpretData,
   type LegendItem,
 } from "#lib/interpret-data";
@@ -37,9 +38,7 @@ export default function BarChart(props: BarChartProps) {
 
     // Calculate scales
     const maxValue = Math.max(...chartPoints.map((d) => d.value));
-    const categoryCount = Array.from(
-      new Set(chartPoints.map((d) => d.label)),
-    ).length;
+    const categoryCount = getCategories(data).length;
 
     // Adjust bar width for grouped bars
     const seriesCount = isMultiSeries
@@ -77,7 +76,7 @@ export default function BarChart(props: BarChartProps) {
     }
 
     // Draw bars
-    const categories = Array.from(new Set(chartPoints.map((d) => d.label)));
+    const categories = getCategories(data);
 
     ctx.textAlign = "center";
     categories.forEach((category, categoryIndex) => {
