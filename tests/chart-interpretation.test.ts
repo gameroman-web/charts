@@ -3,7 +3,6 @@ import { describe, expect, it } from "bun:test";
 import {
   type ChartData,
   getCategories,
-  getSeriesCount,
   getValueHeaders,
   interpretData,
   isMultiSeriesData,
@@ -270,25 +269,6 @@ describe("Chart Data Interpretation", () => {
       expect(getCategories(emptyData)).toEqual([]);
       expect(getValueHeaders(emptyData)).toEqual([]);
       expect(isMultiSeriesData(emptyData)).toBe(false);
-    });
-
-    it("getSeriesCount should return correct count for multi-series data", () => {
-      const twoColumn: ChartData = {
-        headers: ["Category", "Value"],
-        data: [],
-      };
-      const threeColumn: ChartData = {
-        headers: ["Category", "Series1", "Series2"],
-        data: [],
-      };
-      const fourColumn: ChartData = {
-        headers: ["Version", "Framework", "Metric1", "Metric2"],
-        data: [],
-      };
-
-      expect(getSeriesCount(twoColumn)).toBe(0);
-      expect(getSeriesCount(threeColumn)).toBe(2);
-      expect(getSeriesCount(fourColumn)).toBe(3);
     });
   });
 

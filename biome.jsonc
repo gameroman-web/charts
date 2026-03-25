@@ -2,10 +2,6 @@
   "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
   "extends": ["@gameroman/config/biome"],
   "linter": {
-    "rules": {
-      "a11y": "off",
-      "style": { "noNonNullAssertion": "warn" },
-      "suspicious": { "useIterableCallbackReturn": "warn" }
-    }
+    "rules": { "a11y": "off" }
   }
 }
