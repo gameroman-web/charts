@@ -91,7 +91,7 @@ function buildLegend(seriesList: string[]): LegendItem[] {
 }
 
 export function getCategories(data: ChartData): string[] {
-  if (!data || !data.headers.length) return [];
+  if (!data.headers.length) return [];
   const categoryHeader = data.headers[0];
   return [
     ...new Set(

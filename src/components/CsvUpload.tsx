@@ -53,15 +53,6 @@ export default function CsvUpload(props: CsvUploadProps) {
     }
   };
 
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragOver(false);
-  };
-
   const handleFileInput = (e: Event) => {
     const target = e.target as HTMLInputElement;
     const files = target.files;
@@ -79,8 +70,13 @@ export default function CsvUpload(props: CsvUploadProps) {
           : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
       }`}
       onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragOver(true);
+      }}
+      onDragLeave={() => {
+        setIsDragOver(false);
+      }}
       onClick={() => document.getElementById("file-input")?.click()}
     >
       <div class="flex flex-col items-center space-y-4">
