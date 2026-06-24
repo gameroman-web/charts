@@ -62,13 +62,8 @@ export default function CsvUpload(props: CsvUploadProps) {
   };
 
   return (
-    <div
+    <label
       onPaste={handlePaste}
-      class={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all duration-300 ${
-        isDragOver()
-          ? "border-blue-500 bg-blue-50 shadow-sm"
-          : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
-      }`}
       onDrop={handleDrop}
       onDragOver={(e) => {
         e.preventDefault();
@@ -77,32 +72,34 @@ export default function CsvUpload(props: CsvUploadProps) {
       onDragLeave={() => {
         setIsDragOver(false);
       }}
-      onClick={() => document.getElementById("file-input")?.click()}
+      class="border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all duration-300 flex flex-col items-center gap-4"
+      classList={{
+        "border-blue-500 bg-blue-50 shadow-sm": isDragOver(),
+        "border-gray-300 hover:border-blue-400 hover:bg-gray-50": !isDragOver(),
+      }}
     >
-      <div class="flex flex-col items-center space-y-4">
-        <svg
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          class="text-gray-400"
-        >
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="17 8 12 3 7 8"></polyline>
-          <line x1="12" y1="3" x2="12" y2="15"></line>
-        </svg>
-        <h3 class="text-xl font-semibold text-gray-700">Drop CSV file here</h3>
-        <p class="text-gray-500">or click to select</p>
-        <input
-          type="file"
-          id="file-input"
-          accept=".csv"
-          class="hidden"
-          onChange={handleFileInput}
-        />
-      </div>
-    </div>
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        class="text-gray-400"
+        aria-hidden="true"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="17 8 12 3 7 8"></polyline>
+        <line x1="12" y1="3" x2="12" y2="15"></line>
+      </svg>
+      <h3 class="text-xl font-semibold text-gray-700">Drop CSV file here</h3>
+      <p class="text-gray-500">or click to select</p>
+      <input
+        type="file"
+        accept=".csv"
+        class="hidden"
+        onChange={handleFileInput}
+      />
+    </label>
   );
 }

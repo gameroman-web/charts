@@ -28,6 +28,7 @@ export default function App() {
             <BarChart title="Data Visualization" data={chartData()} />
             <div class="text-center">
               <button
+                type="button"
                 class="mt-5 px-5 py-2.5 bg-blue-600 text-white rounded-md cursor-pointer text-sm hover:bg-blue-700 transition-colors duration-200 shadow-sm"
                 onClick={() => {
                   setChartData(null);
