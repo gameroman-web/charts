@@ -1,15 +1,22 @@
 ---
 import "#styles";
 import App from "#app";
+
+const title = "Bar Chart Tool";
+const description = "Bar Chart Tool";
 ---
 
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bar Chart Tool</title>
+    <title>{title}</title>
+    <meta name="description" content={description} />
   </head>
+
   <body>
-    <App client:load />
+    <main>
+      <App client:load />
+    </main>
   </body>
 </html>
