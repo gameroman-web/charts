@@ -1,11 +1,6 @@
 import { createEffect } from "solid-js";
-
-import {
-  type ChartData,
-  getCategories,
-  interpretData,
-  type LegendItem,
-} from "#lib/interpret-data";
+import type { ChartData, LegendItem } from "#lib/interpret-data";
+import { getCategories, interpretData } from "#lib/interpret-data";
 
 interface BarChartProps {
   title: string;

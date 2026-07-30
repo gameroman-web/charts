@@ -1,7 +1,6 @@
 import { describe, expect, it } from "bun:test";
-
+import type { ChartData } from "#lib/interpret-data";
 import {
-  type ChartData,
   getCategories,
   getValueHeaders,
   interpretData,
