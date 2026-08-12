@@ -39,7 +39,7 @@
     "tailwindcss": "4.3.3"
   },
   "devDependencies": {
-    "@astrojs/solid-js": "7.0.1",
+    "@astrojs/solid-js": "7.0.2",
     "@biomejs/biome": "2.5.7",
     "@gameroman/config": "0.2.8",
     "@types/bun": "1.3.14",
